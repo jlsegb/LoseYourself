@@ -1,8 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:just_serve/app/sign_in/social_sign_in_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignInPage extends StatelessWidget {
   static const int FACEBOOK_COLOR = 0xFF334D92;
+
+  Future<void> _signInAnonymously() async {
+    print("in the sign in anonymously");
+    try {
+      final authResult = await FirebaseAuth.instance.signInAnonymously();
+      print('${authResult.user.uid}');
+
+    }
+    catch (e){
+      print(e.toString());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +50,7 @@ class SignInPage extends StatelessWidget {
           ),
           SignInButton(
             color: Colors.white,
-            onPressed: () {},
+            onPressed: _signInAnonymously,
             text: "Sign in with Google",
             textColor: Colors.black87,
             assetName: 'images/google-logo.png',
