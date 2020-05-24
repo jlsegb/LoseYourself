@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class SignInPage extends StatelessWidget {
   SignInPage({@required this.onSignIn});
+
   static const int FACEBOOK_COLOR = 0xFF334D92;
   final Function(FirebaseUser) onSignIn;
 
@@ -11,9 +12,8 @@ class SignInPage extends StatelessWidget {
     print("in the sign in anonymously");
     try {
       final authResult = await FirebaseAuth.instance.signInAnonymously();
-      onSignIn(authResult.user);//callback
-    }
-    catch (e){
+      onSignIn(authResult.user); //callback
+    } catch (e) {
       print(e.toString());
     }
   }
