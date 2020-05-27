@@ -19,6 +19,9 @@ class Auth implements AuthBase {
   final _firebaseAuth = FirebaseAuth.instance;
 
   User _userFromFirebaseInstance(FirebaseUser firebaseUser) {
+    if(firebaseUser == null){
+      return null;
+    }
     return User(uid: firebaseUser.uid);
   }
 

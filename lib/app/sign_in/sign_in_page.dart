@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:just_serve/app/sign_in/social_sign_in_button.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:just_serve/services/auth.dart';
+
+const int FACEBOOK_COLOR = 0xFF334D92;
 
 class SignInPage extends StatelessWidget {
-  SignInPage({@required this.onSignIn});
+  SignInPage({@required this.onSignIn, @required this.auth,});
 
-  static const int FACEBOOK_COLOR = 0xFF334D92;
-  final Function(FirebaseUser) onSignIn;
+  final Function(User) onSignIn;
+  final AuthBase auth;
 
   Future<void> _signInAnonymously() async {
     print("in the sign in anonymously");
     try {
-      final authResult = await FirebaseAuth.instance.signInAnonymously();
-      onSignIn(authResult.user); //callback
+      User user = await auth.signInAnonymously();
+      onSignIn(user); //callback
     } catch (e) {
       print(e.toString());
     }
