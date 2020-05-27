@@ -5,15 +5,15 @@ import 'package:just_serve/services/auth.dart';
 const int FACEBOOK_COLOR = 0xFF334D92;
 
 class SignInPage extends StatelessWidget {
-  SignInPage({@required this.onSignIn, @required this.auth,});
+  SignInPage({
+    @required this.auth,
+  });
 
-  final Function(User) onSignIn;
   final AuthBase auth;
 
   Future<void> _signInAnonymously() async {
     try {
-      User user = await auth.signInAnonymously();
-      onSignIn(user); //callback
+      await auth.signInAnonymously();
     } catch (e) {
       print(e.toString());
     }
