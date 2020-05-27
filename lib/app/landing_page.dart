@@ -19,6 +19,9 @@ class _LandingPageState extends State<LandingPage> {
   void initState() {
     super.initState();
     _verifyFirebaseUser();
+    widget.auth.onAuthStateChange.listen((user) {
+      print("user: ${user?.uid}");
+    });
   }
 
   Future _verifyFirebaseUser() async {
@@ -35,15 +38,32 @@ class _LandingPageState extends State<LandingPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_user == null) {
-      return SignInPage(
-        onSignIn: _updateUser,
-        auth: widget.auth,
-      );
-    }
-    return HomePage(
-      onSignOut: () => _updateUser(null),
-      auth: widget.auth,
+    return StreamBuilder<User>(
+      stream: widget.auth.onAuthStateChange,
+      builder: (
+        context,
+        snapshot,
+      ) {
+        if (snapshot.hasData) {
+          User user = snapshot.data;
+          if (user == null) {
+            return SignInPage(
+              onSignIn: _updateUser,
+              auth: widget.auth,
+            );
+          }
+          return HomePage(
+            onSignOut: () => _updateUser(null),
+            auth: widget.auth,
+          );
+        } else {
+          return Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+      },
     );
   }
 }

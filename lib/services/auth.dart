@@ -13,13 +13,19 @@ abstract class AuthBase {
   Future<User> signInAnonymously();
 
   Future<void> signOut();
+
+  Stream<User> get onAuthStateChange;
 }
 
 class Auth implements AuthBase {
   final _firebaseAuth = FirebaseAuth.instance;
 
+  Stream<User> get onAuthStateChange {
+    return _firebaseAuth.onAuthStateChanged.map(_userFromFirebaseInstance);
+  }
+
   User _userFromFirebaseInstance(FirebaseUser firebaseUser) {
-    if(firebaseUser == null){
+    if (firebaseUser == null) {
       return null;
     }
     return User(uid: firebaseUser.uid);

@@ -11,7 +11,6 @@ class SignInPage extends StatelessWidget {
   final AuthBase auth;
 
   Future<void> _signInAnonymously() async {
-    print("in the sign in anonymously");
     try {
       User user = await auth.signInAnonymously();
       onSignIn(user); //callback
