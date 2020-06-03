@@ -19,11 +19,19 @@ class SignInPage extends StatelessWidget {
     }
   }
 
+  Future<void> _signInWithGoogle() async {
+    try {
+      await auth.signInWithGoogle();
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Just Serve!"),
+        title: Text("Lose Yourself"),
         centerTitle: true,
         elevation: 2.0,
       ),
@@ -52,7 +60,7 @@ class SignInPage extends StatelessWidget {
           ),
           SignInButton(
             color: Colors.white,
-            onPressed: _signInAnonymously,
+            onPressed: _signInWithGoogle,
             text: "Sign in with Google",
             textColor: Colors.black87,
             assetName: 'images/google-logo.png',
@@ -62,7 +70,7 @@ class SignInPage extends StatelessWidget {
           ),
           SignInButton(
             color: Color(FACEBOOK_COLOR),
-            onPressed: () {},
+            onPressed: _signInAnonymously,
             text: "Sign in with Facebook",
             textColor: Colors.white,
             assetName: 'images/facebook-logo.png',
