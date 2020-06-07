@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: "Material App Title",
       theme: ThemeData(
-        primarySwatch: Colors.indigo,
+        primarySwatch: Colors.pink,
       ),
       home: LandingPage(auth: Auth(),),
     );
