@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:just_serve/custom_widgets/common_raised_button.dart';
 
-class SignInButton extends CustomRaisedButton {
-  SignInButton({
+class SocialSignInButton extends CustomRaisedButton {
+  SocialSignInButton({
     @required String assetName,
     @required String text,
     Color color,

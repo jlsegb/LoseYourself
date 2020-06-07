@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:just_serve/app/sign_in/sign_in_button.dart';
 import 'package:just_serve/app/sign_in/social_sign_in_button.dart';
 import 'package:just_serve/services/auth.dart';
 
@@ -25,6 +26,10 @@ class SignInPage extends StatelessWidget {
     } catch (e) {
       print(e.toString());
     }
+  }
+
+  void _signInWithEmail() async {
+
   }
 
   @override
@@ -58,7 +63,7 @@ class SignInPage extends StatelessWidget {
           SizedBox(
             height: 36.0,
           ),
-          SignInButton(
+          SocialSignInButton(
             color: Colors.white,
             onPressed: _signInWithGoogle,
             text: "Sign in with Google",
@@ -69,11 +74,10 @@ class SignInPage extends StatelessWidget {
             height: 16.0,
           ),
           SignInButton(
-            color: Color(FACEBOOK_COLOR),
-            onPressed: _signInAnonymously,
-            text: "Sign in with Facebook",
-            textColor: Colors.white,
-            assetName: 'images/facebook-logo.png',
+            color: Colors.indigo,
+            textColor:  Colors.white,
+            onPressed: _signInWithEmail,
+            text: "Sign in with Email",
           ),
         ],
       ),
