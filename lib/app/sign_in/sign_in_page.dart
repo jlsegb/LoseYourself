@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:just_serve/app/sign_in/email_sign_in_page.dart';
 import 'package:just_serve/app/sign_in/sign_in_button.dart';
 import 'package:just_serve/app/sign_in/social_sign_in_button.dart';
 import 'package:just_serve/services/auth.dart';
@@ -12,14 +13,6 @@ class SignInPage extends StatelessWidget {
 
   final AuthBase auth;
 
-  Future<void> _signInAnonymously() async {
-    try {
-      await auth.signInAnonymously();
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
   Future<void> _signInWithGoogle() async {
     try {
       await auth.signInWithGoogle();
@@ -28,8 +21,13 @@ class SignInPage extends StatelessWidget {
     }
   }
 
-  void _signInWithEmail() async {
-
+  void _signInWithEmail(BuildContext context)  {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        fullscreenDialog: true, //adds an x instead of an <
+        builder: (context) => EmailSignInPage(),
+      )
+    );
   }
 
   @override
@@ -40,12 +38,12 @@ class SignInPage extends StatelessWidget {
         centerTitle: true,
         elevation: 2.0,
       ),
-      body: _buildContent(),
+      body: _buildContent(context),
       backgroundColor: Colors.grey[200],
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(16),
       child: Column(
@@ -76,7 +74,7 @@ class SignInPage extends StatelessWidget {
           SignInButton(
             color: Colors.indigo,
             textColor:  Colors.white,
-            onPressed: _signInWithEmail,
+            onPressed: () => _signInWithEmail(context),
             text: "Sign in with Email",
           ),
         ],
