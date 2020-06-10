@@ -54,23 +54,11 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
         : 'Already Have an account? Sign in here!';
 
     return [
-      TextField(
-        controller: _emailController,
-        decoration: InputDecoration(
-          labelText: 'Email',
-          hintText: 'userName@serverName.com',
-        ),
-      ),
+      _buildEmailTextField(),
       SizedBox(
         height: 8.0,
       ),
-      TextField(
-        controller: _passwordController,
-        decoration: InputDecoration(
-          labelText: 'Password',
-        ),
-        obscureText: true,
-      ),
+      _buildPasswordTextField(),
       SizedBox(
         height: 8.0,
       ),
@@ -86,6 +74,31 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
         onPressed: _toggleFormTypeAndClearTextField,
       ),
     ];
+  }
+
+  TextField _buildEmailTextField() {
+    return TextField(
+      controller: _emailController,
+      decoration: InputDecoration(
+        labelText: 'Email',
+        hintText: 'userName@serverName.com',
+      ),
+      autocorrect: false,
+      keyboardType: TextInputType.emailAddress,
+      textInputAction: TextInputAction.next,
+    );
+  }
+
+  TextField _buildPasswordTextField() {
+    return TextField(
+      controller: _passwordController,
+      decoration: InputDecoration(
+        labelText: 'Password',
+      ),
+      obscureText: true,
+      autocorrect: false,
+      textInputAction: TextInputAction.done,
+    );
   }
 
   @override
