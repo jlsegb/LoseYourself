@@ -7,9 +7,7 @@ import 'package:just_serve/services/auth.dart';
 const int FACEBOOK_COLOR = 0xFF334D92;
 
 class SignInPage extends StatelessWidget {
-  SignInPage({
-    @required this.auth,
-  });
+  SignInPage({@required this.auth});
 
   final AuthBase auth;
 
@@ -21,13 +19,13 @@ class SignInPage extends StatelessWidget {
     }
   }
 
-  void _signInWithEmail(BuildContext context)  {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        fullscreenDialog: true, //adds an x instead of an <
-        builder: (context) => EmailSignInPage(),
-      )
-    );
+  void _signInWithEmail(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      fullscreenDialog: true, //adds an x instead of an <
+      builder: (context) => EmailSignInPage(
+        auth: auth,
+      ),
+    ));
   }
 
   @override
@@ -73,7 +71,7 @@ class SignInPage extends StatelessWidget {
           ),
           SignInButton(
             color: Colors.indigo,
-            textColor:  Colors.white,
+            textColor: Colors.white,
             onPressed: () => _signInWithEmail(context),
             text: "Sign in with Email",
           ),

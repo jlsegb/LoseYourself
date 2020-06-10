@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:just_serve/custom_widgets/form_submit_button.dart';
+import 'package:just_serve/services/auth.dart';
 
-enum EmailSignInFormType { signIn, register}
+enum EmailSignInFormType { signIn, register }
 
 class EmailSignInForm extends StatefulWidget {
+  final AuthBase auth;
+
+  EmailSignInForm({@required this.auth});
+
   @override
   _EmailSignInFormState createState() => _EmailSignInFormState();
 }
@@ -11,32 +16,48 @@ class EmailSignInForm extends StatefulWidget {
 class _EmailSignInFormState extends State<EmailSignInForm> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  EmailSignInFormType _formType = EmailSignInFormType.register;
 
-  void _submit () {
-    //
+  String get _password => _passwordController.text;
+
+  String get _email => _emailController.text;
+
+  EmailSignInFormType _formType = EmailSignInFormType.signIn;
+
+  void _submit() async {
+    try {
+      if (_formType == EmailSignInFormType.signIn) {
+        await widget.auth.signInWithEmailAndPassword(_email, _password);
+      } else {
+        await widget.auth.createUserWithEmailAndPassword(_email, _password);
+      }
+      Navigator.of(context).pop();//Registration or sign in successful.
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
-  void toggleFormTypeAndClearTextField(){
+  void _toggleFormTypeAndClearTextField() {
     setState(() {
-      _formType = _formType == EmailSignInFormType.signIn?
-          EmailSignInFormType.register : EmailSignInFormType.signIn;
+      _formType = _formType == EmailSignInFormType.signIn
+          ? EmailSignInFormType.register
+          : EmailSignInFormType.signIn;
     });
     _emailController.clear();
     _passwordController.clear();
   }
 
   List<Widget> _buildChildren() {
-    final primaryText = _formType == EmailSignInFormType.signIn?
-        'Sign In' : 'Register';
-    final secondaryText = _formType == EmailSignInFormType.signIn?
-        'New to Lose Yourself? Create your account' : 'Already Have an account? Sign in here!';
+    final primaryText =
+        _formType == EmailSignInFormType.signIn ? 'Sign In' : 'Create Account';
+    final secondaryText = _formType == EmailSignInFormType.signIn
+        ? 'New to Lose Yourself? Create your account!'
+        : 'Already Have an account? Sign in here!';
 
     return [
       TextField(
         controller: _emailController,
         decoration: InputDecoration(
-          labelText: 'Email - Cannot be the same as social account',
+          labelText: 'Email',
           hintText: 'userName@serverName.com',
         ),
       ),
@@ -55,14 +76,14 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       ),
       FormSubmitButton(
         text: primaryText,
-        onPressed: () {},
+        onPressed: _submit,
       ),
       SizedBox(
         height: 8.0,
       ),
       FlatButton(
         child: Text(secondaryText),
-        onPressed: _submit,
+        onPressed: _toggleFormTypeAndClearTextField,
       ),
     ];
   }
