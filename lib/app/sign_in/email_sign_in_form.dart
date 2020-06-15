@@ -14,7 +14,8 @@ class EmailSignInForm extends StatefulWidget {
   _EmailSignInFormState createState() => _EmailSignInFormState();
 }
 
-class _EmailSignInFormState extends State<EmailSignInForm> with EmailAndPasswordValidators{
+class _EmailSignInFormState extends State<EmailSignInForm>
+    with EmailAndPasswordValidators {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final FocusNode _emailFocusNode = FocusNode();
@@ -27,7 +28,6 @@ class _EmailSignInFormState extends State<EmailSignInForm> with EmailAndPassword
 
   String get _email => _emailController.text;
 
-
   void _submit() async {
     setState(() {
       _hasBeenSubmitted = true;
@@ -39,8 +39,23 @@ class _EmailSignInFormState extends State<EmailSignInForm> with EmailAndPassword
       } else {
         await widget.auth.createUserWithEmailAndPassword(_email, _password);
       }
-      Navigator.of(context).pop();//Registration or sign in successful.
+      Navigator.of(context).pop(); //Registration or sign in successful.
     } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Log in failed.'),
+            content: Text(e.toString()),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Ok'),
+                onPressed: () => Navigator.of(context).pop(),
+              )
+            ],
+          );
+        },
+      );
       print(e.toString());
     } finally {
       setState(() {
@@ -50,12 +65,15 @@ class _EmailSignInFormState extends State<EmailSignInForm> with EmailAndPassword
   }
 
   void _emailEditingComplete() {
-    FocusNode correctFocusNode = emailValidator.isValid(_email) ? _passwordFocusNode : _emailFocusNode;
+    FocusNode correctFocusNode =
+        emailValidator.isValid(_email) ? _passwordFocusNode : _emailFocusNode;
     FocusScope.of(context).requestFocus(correctFocusNode);
   }
 
   void _passwordEditingComplete() {
-    emailValidator.isValid(_password) ?  _submit() : FocusScope.of(context).requestFocus(_passwordFocusNode);
+    emailValidator.isValid(_password)
+        ? _submit()
+        : FocusScope.of(context).requestFocus(_passwordFocusNode);
   }
 
   void _toggleFormTypeAndClearTextField() {
@@ -76,7 +94,9 @@ class _EmailSignInFormState extends State<EmailSignInForm> with EmailAndPassword
         ? 'New to Lose Yourself? Create your account!'
         : 'Already Have an account? Sign in here!';
 
-    bool enableLogInButton = emailValidator.isValid(_email) && passwordValidator.isValid(_password) && !_isFormWaitingForFirebaseResponse;
+    bool enableLogInButton = emailValidator.isValid(_email) &&
+        passwordValidator.isValid(_password) &&
+        !_isFormWaitingForFirebaseResponse;
     return [
       _buildEmailTextField(),
       SizedBox(
@@ -88,14 +108,16 @@ class _EmailSignInFormState extends State<EmailSignInForm> with EmailAndPassword
       ),
       FormSubmitButton(
         text: primaryText,
-        onPressed: enableLogInButton? _submit : null,
+        onPressed: enableLogInButton ? _submit : null,
       ),
       SizedBox(
         height: 8.0,
       ),
       FlatButton(
         child: Text(secondaryText),
-        onPressed: _isFormWaitingForFirebaseResponse ? null : _toggleFormTypeAndClearTextField,
+        onPressed: _isFormWaitingForFirebaseResponse
+            ? null
+            : _toggleFormTypeAndClearTextField,
       ),
     ];
   }
@@ -120,7 +142,8 @@ class _EmailSignInFormState extends State<EmailSignInForm> with EmailAndPassword
   }
 
   TextField _buildPasswordTextField() {
-    bool isPasswordInvalid = _hasBeenSubmitted && !passwordValidator.isValid(_password);
+    bool isPasswordInvalid =
+        _hasBeenSubmitted && !passwordValidator.isValid(_password);
     return TextField(
       onChanged: (password) => updateForm(),
       focusNode: _passwordFocusNode,
@@ -150,7 +173,6 @@ class _EmailSignInFormState extends State<EmailSignInForm> with EmailAndPassword
   }
 
   updateForm() {
-    setState(() {
-    });
+    setState(() {});
   }
 }
