@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:just_serve/app/sign_in/validators.dart';
 import 'package:just_serve/custom_widgets/form_submit_button.dart';
+import 'package:just_serve/custom_widgets/platform_alert_dialog.dart';
 import 'package:just_serve/services/auth.dart';
+import 'dart:io';
 
 enum EmailSignInFormType { signIn, register }
 
@@ -41,22 +43,15 @@ class _EmailSignInFormState extends State<EmailSignInForm>
       }
       Navigator.of(context).pop(); //Registration or sign in successful.
     } catch (e) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Log in failed.'),
-            content: Text(e.toString()),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('Ok'),
-                onPressed: () => Navigator.of(context).pop(),
-              )
-            ],
-          );
-        },
-      );
-      print(e.toString());
+      if (Platform.isIOS) {
+        //show cupertino widget
+      } else {
+        PlatformAlertDialog(
+          title: 'Sign in failed.',
+          actionText: 'Ok',
+          dialogContent: e.toString(),
+        ).show(context);
+      }
     } finally {
       setState(() {
         _isFormWaitingForFirebaseResponse = false;
