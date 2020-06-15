@@ -50,7 +50,12 @@ class _EmailSignInFormState extends State<EmailSignInForm> with EmailAndPassword
   }
 
   void _emailEditingComplete() {
-    FocusScope.of(context).requestFocus(_passwordFocusNode);
+    FocusNode correctFocusNode = emailValidator.isValid(_email) ? _passwordFocusNode : _emailFocusNode;
+    FocusScope.of(context).requestFocus(correctFocusNode);
+  }
+
+  void _passwordEditingComplete() {
+    emailValidator.isValid(_password) ?  _submit() : FocusScope.of(context).requestFocus(_passwordFocusNode);
   }
 
   void _toggleFormTypeAndClearTextField() {
@@ -128,7 +133,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> with EmailAndPassword
       obscureText: true,
       autocorrect: false,
       textInputAction: TextInputAction.done,
-      onEditingComplete: _submit,
+      onEditingComplete: _passwordEditingComplete,
     );
   }
 
