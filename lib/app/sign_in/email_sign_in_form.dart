@@ -21,6 +21,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> with EmailAndPassword
   final FocusNode _passwordFocusNode = FocusNode();
   EmailSignInFormType _formType = EmailSignInFormType.signIn;
   bool _hasBeenSubmitted = false;
+  bool _isFormWaitingForFirebaseResponse = false;
 
   String get _password => _passwordController.text;
 
@@ -28,7 +29,10 @@ class _EmailSignInFormState extends State<EmailSignInForm> with EmailAndPassword
 
 
   void _submit() async {
-    _hasBeenSubmitted = true;
+    setState(() {
+      _hasBeenSubmitted = true;
+      _isFormWaitingForFirebaseResponse = true;
+    });
     try {
       if (_formType == EmailSignInFormType.signIn) {
         await widget.auth.signInWithEmailAndPassword(_email, _password);
@@ -38,6 +42,10 @@ class _EmailSignInFormState extends State<EmailSignInForm> with EmailAndPassword
       Navigator.of(context).pop();//Registration or sign in successful.
     } catch (e) {
       print(e.toString());
+    } finally {
+      setState(() {
+        _isFormWaitingForFirebaseResponse = false;
+      });
     }
   }
 
@@ -63,7 +71,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> with EmailAndPassword
         ? 'New to Lose Yourself? Create your account!'
         : 'Already Have an account? Sign in here!';
 
-    bool isLogInValid = emailValidator.isValid(_email) && passwordValidator.isValid(_password);
+    bool enableLogInButton = emailValidator.isValid(_email) && passwordValidator.isValid(_password) && !_isFormWaitingForFirebaseResponse;
     return [
       _buildEmailTextField(),
       SizedBox(
@@ -75,14 +83,14 @@ class _EmailSignInFormState extends State<EmailSignInForm> with EmailAndPassword
       ),
       FormSubmitButton(
         text: primaryText,
-        onPressed: isLogInValid? _submit : null,
+        onPressed: enableLogInButton? _submit : null,
       ),
       SizedBox(
         height: 8.0,
       ),
       FlatButton(
         child: Text(secondaryText),
-        onPressed: _toggleFormTypeAndClearTextField,
+        onPressed: _isFormWaitingForFirebaseResponse ? null : _toggleFormTypeAndClearTextField,
       ),
     ];
   }
@@ -93,6 +101,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> with EmailAndPassword
       onChanged: (email) => updateForm(),
       focusNode: _emailFocusNode,
       controller: _emailController,
+      enabled: !_isFormWaitingForFirebaseResponse,
       decoration: InputDecoration(
         labelText: 'Email',
         hintText: 'userName@serverName.com',
@@ -111,6 +120,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> with EmailAndPassword
       onChanged: (password) => updateForm(),
       focusNode: _passwordFocusNode,
       controller: _passwordController,
+      enabled: !_isFormWaitingForFirebaseResponse,
       decoration: InputDecoration(
         labelText: 'Password',
         errorText: isPasswordInvalid ? invalidPasswordMessage : null,
