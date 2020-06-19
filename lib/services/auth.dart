@@ -58,8 +58,7 @@ class Auth implements AuthBase {
     GoogleSignInAccount googleAccount = await googleSignIn.signIn();
 
     if (googleAccount != null) {
-      GoogleSignInAuthentication googleAuth =
-          await googleAccount.authentication;
+      GoogleSignInAuthentication googleAuth = await googleAccount.authentication;
       if (googleAuth.idToken != null && googleAuth.accessToken != null) {
         final authResult = await _firebaseAuth.signInWithCredential(
           GoogleAuthProvider.getCredential(

@@ -5,20 +5,22 @@ import 'dart:io';
 
 class PlatformAlertDialog extends PlatformWidget {
   PlatformAlertDialog({
-    @required this.actionText,
+    @required this.defaultActionText,
     @required this.dialogContent,
     @required this.title,
-  })  : assert(actionText != null),
+    this.cancelActionText,
+  })  : assert(defaultActionText != null),
         assert(dialogContent != null),
         assert(title != null);
 
   final String title;
-  final String actionText;
+  final String defaultActionText;
   final String dialogContent;
+  final String cancelActionText;
 
   Future<bool> show(BuildContext context) async {
     return Platform.isAndroid
-        ? await showDialog<bool> (
+        ? await showDialog<bool>(
             context: context,
             builder: (context) => this,
           )
@@ -47,12 +49,22 @@ class PlatformAlertDialog extends PlatformWidget {
   }
 
   List<Widget> _buildActions(BuildContext context) {
-    return [
+    final actionsList = <Widget>[];
+    if (cancelActionText != null) {
+      actionsList.add(
+        PlatformAlertDialogAction(
+          child: Text(cancelActionText),
+          onPressed: () => Navigator.of(context).pop(false),
+        ),
+      );
+    }
+    actionsList.add(
       PlatformAlertDialogAction(
-        child: Text(actionText),
-        onPressed: () => Navigator.of(context).pop(),
+        child: Text(defaultActionText),
+        onPressed: () => Navigator.of(context).pop(true),
       ),
-    ];
+    );
+    return actionsList;
   }
 }
 
