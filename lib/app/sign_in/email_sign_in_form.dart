@@ -2,22 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:just_serve/app/sign_in/validators.dart';
 import 'package:just_serve/custom_widgets/form_submit_button.dart';
 import 'package:just_serve/custom_widgets/platform_alert_dialog.dart';
-import 'package:just_serve/services/auth.dart';
 import 'dart:io';
+
+import 'package:just_serve/services/auth_provider.dart';
 
 enum EmailSignInFormType { signIn, register }
 
-class EmailSignInForm extends StatefulWidget {
-  final AuthBase auth;
-
-  EmailSignInForm({@required this.auth});
-
+class EmailSignInForm extends StatefulWidget with EmailAndPasswordValidators {
   @override
   _EmailSignInFormState createState() => _EmailSignInFormState();
 }
 
-class _EmailSignInFormState extends State<EmailSignInForm>
-    with EmailAndPasswordValidators {
+class _EmailSignInFormState extends State<EmailSignInForm> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final FocusNode _emailFocusNode = FocusNode();
@@ -36,10 +32,11 @@ class _EmailSignInFormState extends State<EmailSignInForm>
       _isFormWaitingForFirebaseResponse = true;
     });
     try {
+      final auth = AuthProvider.of(context);
       if (_formType == EmailSignInFormType.signIn) {
-        await widget.auth.signInWithEmailAndPassword(_email, _password);
+        await auth.signInWithEmailAndPassword(_email, _password);
       } else {
-        await widget.auth.createUserWithEmailAndPassword(_email, _password);
+        await auth.createUserWithEmailAndPassword(_email, _password);
       }
       Navigator.of(context).pop(); //Registration or sign in successful.
     } catch (e) {
@@ -61,12 +58,12 @@ class _EmailSignInFormState extends State<EmailSignInForm>
 
   void _emailEditingComplete() {
     FocusNode correctFocusNode =
-        emailValidator.isValid(_email) ? _passwordFocusNode : _emailFocusNode;
+        widget.emailValidator.isValid(_email) ? _passwordFocusNode : _emailFocusNode;
     FocusScope.of(context).requestFocus(correctFocusNode);
   }
 
   void _passwordEditingComplete() {
-    emailValidator.isValid(_password)
+    widget.emailValidator.isValid(_password)
         ? _submit()
         : FocusScope.of(context).requestFocus(_passwordFocusNode);
   }
@@ -89,8 +86,8 @@ class _EmailSignInFormState extends State<EmailSignInForm>
         ? 'New to Lose Yourself? Create your account!'
         : 'Already Have an account? Sign in here!';
 
-    bool enableLogInButton = emailValidator.isValid(_email) &&
-        passwordValidator.isValid(_password) &&
+    bool enableLogInButton = widget.emailValidator.isValid(_email) &&
+        widget.passwordValidator.isValid(_password) &&
         !_isFormWaitingForFirebaseResponse;
     return [
       _buildEmailTextField(),
@@ -118,7 +115,7 @@ class _EmailSignInFormState extends State<EmailSignInForm>
   }
 
   TextField _buildEmailTextField() {
-    bool isEmailInvalid = _hasBeenSubmitted && !emailValidator.isValid(_email);
+    bool isEmailInvalid = _hasBeenSubmitted && !widget.emailValidator.isValid(_email);
     return TextField(
       onChanged: (email) => updateForm(),
       focusNode: _emailFocusNode,
@@ -127,7 +124,7 @@ class _EmailSignInFormState extends State<EmailSignInForm>
       decoration: InputDecoration(
         labelText: 'Email',
         hintText: 'userName@serverName.com',
-        errorText: isEmailInvalid ? invalidEmailMessage : null,
+        errorText: isEmailInvalid ? widget.invalidEmailMessage : null,
       ),
       autocorrect: false,
       keyboardType: TextInputType.emailAddress,
@@ -138,7 +135,7 @@ class _EmailSignInFormState extends State<EmailSignInForm>
 
   TextField _buildPasswordTextField() {
     bool isPasswordInvalid =
-        _hasBeenSubmitted && !passwordValidator.isValid(_password);
+        _hasBeenSubmitted && !widget.passwordValidator.isValid(_password);
     return TextField(
       onChanged: (password) => updateForm(),
       focusNode: _passwordFocusNode,
@@ -146,7 +143,7 @@ class _EmailSignInFormState extends State<EmailSignInForm>
       enabled: !_isFormWaitingForFirebaseResponse,
       decoration: InputDecoration(
         labelText: 'Password',
-        errorText: isPasswordInvalid ? invalidPasswordMessage : null,
+        errorText: isPasswordInvalid ? widget.invalidPasswordMessage : null,
       ),
       obscureText: true,
       autocorrect: false,

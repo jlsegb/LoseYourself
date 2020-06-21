@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:just_serve/custom_widgets/platform_alert_dialog.dart';
-import 'package:just_serve/services/auth.dart';
+import 'package:just_serve/services/auth_provider.dart';
 
 class HomePage extends StatelessWidget {
-  HomePage({
-    @required this.auth,
-  });
-
-  final AuthBase auth;
-
-  Future<void> _signOut() async {
+  Future<void> _signOut(BuildContext context) async {
+    final auth = AuthProvider.of(context);
     try {
       await auth.signOut();
     } catch (e) {
@@ -26,7 +21,7 @@ class HomePage extends StatelessWidget {
     ).show(context);
 
     if (isLogoutRequested){
-      _signOut();
+      _signOut(context);
     }
   }
 

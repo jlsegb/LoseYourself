@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:just_serve/app/sign_in/email_sign_in_page.dart';
 import 'package:just_serve/app/sign_in/sign_in_button.dart';
 import 'package:just_serve/app/sign_in/social_sign_in_button.dart';
-import 'package:just_serve/services/auth.dart';
+import 'package:just_serve/services/auth_provider.dart';
 
 const int FACEBOOK_COLOR = 0xFF334D92;
 
 class SignInPage extends StatelessWidget {
-  SignInPage({@required this.auth});
-
-  final AuthBase auth;
-
-  Future<void> _signInWithGoogle() async {
+  Future<void> _signInWithGoogle(BuildContext context) async {
+    final auth = AuthProvider.of(context);
     try {
       await auth.signInWithGoogle();
     } catch (e) {
@@ -22,9 +19,7 @@ class SignInPage extends StatelessWidget {
   void _signInWithEmail(BuildContext context) {
     Navigator.of(context).push(MaterialPageRoute<void>(
       fullscreenDialog: true, //adds an x instead of an <
-      builder: (context) => EmailSignInPage(
-        auth: auth,
-      ),
+      builder: (context) => EmailSignInPage(),
     ));
   }
 
@@ -61,7 +56,7 @@ class SignInPage extends StatelessWidget {
           ),
           SocialSignInButton(
             color: Colors.white,
-            onPressed: _signInWithGoogle,
+            onPressed: () => _signInWithGoogle(context),
             text: "Sign in with Google",
             textColor: Colors.black87,
             assetName: 'images/google-logo.png',
