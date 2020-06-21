@@ -4,7 +4,8 @@ import 'package:just_serve/custom_widgets/form_submit_button.dart';
 import 'package:just_serve/custom_widgets/platform_alert_dialog.dart';
 import 'dart:io';
 
-import 'package:just_serve/services/auth_provider.dart';
+import 'package:just_serve/services/auth.dart';
+import 'package:provider/provider.dart';
 
 enum EmailSignInFormType { signIn, register }
 
@@ -32,7 +33,7 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       _isFormWaitingForFirebaseResponse = true;
     });
     try {
-      final auth = AuthProvider.of(context);
+      final auth = Provider.of<AuthBase>(context, listen: false);
       if (_formType == EmailSignInFormType.signIn) {
         await auth.signInWithEmailAndPassword(_email, _password);
       } else {

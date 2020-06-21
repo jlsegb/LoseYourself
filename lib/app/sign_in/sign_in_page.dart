@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:just_serve/app/sign_in/email_sign_in_page.dart';
 import 'package:just_serve/app/sign_in/sign_in_button.dart';
 import 'package:just_serve/app/sign_in/social_sign_in_button.dart';
-import 'package:just_serve/services/auth_provider.dart';
+import 'package:just_serve/services/auth.dart';
+import 'package:provider/provider.dart';
 
 const int FACEBOOK_COLOR = 0xFF334D92;
 
 class SignInPage extends StatelessWidget {
   Future<void> _signInWithGoogle(BuildContext context) async {
-    final auth = AuthProvider.of(context);
+    final auth = Provider.of<AuthBase>(context, listen: false);
     try {
       await auth.signInWithGoogle();
     } catch (e) {
