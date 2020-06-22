@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:just_serve/app/sign_in/validators.dart';
 import 'package:just_serve/custom_widgets/form_submit_button.dart';
 import 'package:just_serve/custom_widgets/platform_alert_dialog.dart';
-import 'dart:io';
 
 import 'package:just_serve/services/auth.dart';
 import 'package:provider/provider.dart';
