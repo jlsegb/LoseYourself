@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:just_serve/app/sign_in/validators.dart';
 import 'package:just_serve/custom_widgets/form_submit_button.dart';
 import 'package:just_serve/custom_widgets/platform_alert_dialog.dart';
@@ -40,16 +42,13 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
         await auth.createUserWithEmailAndPassword(_email, _password);
       }
       Navigator.of(context).pop(); //Registration or sign in successful.
-    } catch (e) {
-      if (Platform.isIOS) {
-        //show cupertino widget
-      } else {
-        PlatformAlertDialog(
-          title: 'Sign in failed.',
-          defaultActionText: 'Ok',
-          dialogContent: e.toString(),
-        ).show(context);
-      }
+    } on PlatformException catch (e) {
+      final message = e.message;
+      PlatformAlertDialog(
+        title: 'Sign in failed.',
+        defaultActionText: 'Ok',
+        dialogContent: message,
+      ).show(context);
     } finally {
       setState(() {
         _isFormWaitingForFirebaseResponse = false;
@@ -58,8 +57,9 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
   }
 
   void _emailEditingComplete() {
-    FocusNode correctFocusNode =
-        widget.emailValidator.isValid(_email) ? _passwordFocusNode : _emailFocusNode;
+    FocusNode correctFocusNode = widget.emailValidator.isValid(_email)
+        ? _passwordFocusNode
+        : _emailFocusNode;
     FocusScope.of(context).requestFocus(correctFocusNode);
   }
 
@@ -116,7 +116,8 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
   }
 
   TextField _buildEmailTextField() {
-    bool isEmailInvalid = _hasBeenSubmitted && !widget.emailValidator.isValid(_email);
+    bool isEmailInvalid =
+        _hasBeenSubmitted && !widget.emailValidator.isValid(_email);
     return TextField(
       onChanged: (email) => updateForm(),
       focusNode: _emailFocusNode,
