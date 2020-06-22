@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:just_serve/app/sign_in/validators.dart';
+import 'package:just_serve/custom_widgets/firebase_platform_exception_alert_dialog.dart';
 import 'package:just_serve/custom_widgets/form_submit_button.dart';
-import 'package:just_serve/custom_widgets/platform_alert_dialog.dart';
 
 import 'package:just_serve/services/auth.dart';
 import 'package:provider/provider.dart';
@@ -42,11 +42,10 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       }
       Navigator.of(context).pop(); //Registration or sign in successful.
     } on PlatformException catch (e) {
-      final message = e.message;
-      PlatformAlertDialog(
+      FirebasePlatformExceptionAlertDialog(
         title: 'Sign in failed.',
-        defaultActionText: 'Ok',
-        dialogContent: message,
+        actionText: 'OK',
+        exception: e,
       ).show(context);
     } finally {
       setState(() {

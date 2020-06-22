@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:just_serve/app/sign_in/email_sign_in_page.dart';
 import 'package:just_serve/app/sign_in/sign_in_button.dart';
 import 'package:just_serve/app/sign_in/social_sign_in_button.dart';
+import 'package:just_serve/custom_widgets/firebase_platform_exception_alert_dialog.dart';
 import 'package:just_serve/services/auth.dart';
 import 'package:provider/provider.dart';
 
@@ -12,8 +14,12 @@ class SignInPage extends StatelessWidget {
     final auth = Provider.of<AuthBase>(context, listen: false);
     try {
       await auth.signInWithGoogle();
-    } catch (e) {
-      print(e.toString());
+    } on PlatformException catch (e) {
+      FirebasePlatformExceptionAlertDialog(
+        actionText: 'OK',
+        title: 'Sign in failed',
+        exception: e,
+      );
     }
   }
 
