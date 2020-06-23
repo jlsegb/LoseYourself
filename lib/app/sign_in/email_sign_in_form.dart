@@ -28,6 +28,13 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
 
   String get _email => _emailController.text;
 
+  void dispose(){
+    _emailController.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
   void _submit() async {
     setState(() {
       _hasBeenSubmitted = true;
