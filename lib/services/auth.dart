@@ -14,8 +14,6 @@ abstract class AuthBase {
 
   Future<User> currentUser();
 
-  Future<User> signInAnonymously();
-
   Future<User> signInWithGoogle();
 
   Future<User> signInWithEmailAndPassword(String email, String password);
@@ -43,13 +41,6 @@ class Auth implements AuthBase {
   Future<User> currentUser() async {
     final firebaseUser = await _firebaseAuth.currentUser();
     return _userFromFirebaseInstance(firebaseUser);
-  }
-
-  @override
-  Future<User> signInAnonymously() async {
-    final authResult = await _firebaseAuth.signInAnonymously();
-
-    return _userFromFirebaseInstance(authResult.user);
   }
 
   @override

@@ -10,21 +10,27 @@ import 'package:provider/provider.dart';
 
 const int FACEBOOK_COLOR = 0xFF334D92;
 
-class SignInPage extends StatefulWidget {
+class SignInPage extends StatelessWidget {
+  const SignInPage({Key key, @required this.bloc}) : super(key: key);
+  final SignInBloc bloc;
+
   static Widget create(BuildContext context) {
     return Provider<SignInBloc>(
-      create: (context) => SignInBloc(),
-      child: SignInPage(),
+      dispose: (
+        context,
+        bloc,
+      ) =>
+          bloc.dispose(),
+      create: (context) => SignInBloc(auth: Provider.of<AuthBase>(context, listen: false),),
+      child: Consumer<SignInBloc>(
+        builder: (context, bloc, _) => SignInPage(
+          bloc: bloc,
+        ),
+      ),
     );
   }
 
-  @override
-  _SignInPageState createState() => _SignInPageState();
-}
-
-class _SignInPageState extends State<SignInPage> {
   Future<void> _signInWithGoogle(BuildContext context) async {
-    final bloc = Provider.of<SignInBloc>(context, listen: false);
     final auth = Provider.of<AuthBase>(context, listen: false);
     try {
       bloc.setIsLoading(true);
