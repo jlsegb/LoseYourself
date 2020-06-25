@@ -31,18 +31,14 @@ class SignInPage extends StatelessWidget {
   }
 
   Future<void> _signInWithGoogle(BuildContext context) async {
-    final auth = Provider.of<AuthBase>(context, listen: false);
     try {
-      bloc.setIsLoading(true);
-      await auth.signInWithGoogle();
+      await bloc.signInWithGoogle();
     } on PlatformException catch (e) {
       FirebasePlatformExceptionAlertDialog(
         actionText: 'OK',
         title: 'Sign in failed',
         exception: e,
       );
-    } finally {
-      bloc.setIsLoading(false);
     }
   }
 

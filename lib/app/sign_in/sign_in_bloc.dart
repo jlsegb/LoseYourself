@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:just_serve/services/auth.dart';
 
 class SignInBloc {
@@ -10,21 +10,22 @@ class SignInBloc {
 
   Stream<bool> get isLoadingStream => _isLoadingController.stream;
 
-  void setIsLoading(bool isLoading) => _isLoadingController.add(isLoading);
+  void _setIsLoading(bool isLoading) => _isLoadingController.add(isLoading);
 
   void dispose() {
     _isLoadingController.close();
   }
 
-  Future<User> _signIn(Future<User> Function() signInMethod) {
+  Future<User> _signIn(Future<User> Function() signInMethod) async {
     try{
-      setIsLoading(true);
+      _setIsLoading(true);
+      return await signInMethod();
     } catch (e) {
       rethrow;
     } finally {
-      setIsLoading(false);
+      _setIsLoading(false);
     }
   }
 
-  Future<User> signInWithGoogle() => _signIn(auth.signInWithGoogle);
+  Future<User> signInWithGoogle() async => _signIn(auth.signInWithGoogle);
 }
