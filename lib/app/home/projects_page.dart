@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:just_serve/app/home/models/project.dart';
+import 'package:just_serve/custom_widgets/firebase_platform_exception_alert_dialog.dart';
 import 'package:just_serve/custom_widgets/platform_alert_dialog.dart';
 import 'package:just_serve/services/auth.dart';
 import 'package:just_serve/services/database.dart';
@@ -27,17 +29,27 @@ class ProjectsPage extends StatelessWidget {
     }
   }
 
-  Future<void> _createProject(BuildContext context) async{
-    print('button pressed!!!!!!!!!!!!!!');
-    final database = Provider.of<Database>(context, listen: false,);
-    print('after database');
-    print(database.uidGet);
-    await database.createProject(
-      {
-        'name': 'FirstProject',
-        'description': 'The description of the project 2',
-      },
-    );
+  Future<void> _createProject(BuildContext context) async {
+    try {
+      print('');
+      final database = Provider.of<Database>(
+        context,
+        listen: false,
+      );
+      await database.createProject(
+        Project(
+          description: 'this is the project description',
+          name: 'project name',
+          ownerContactInformation: 'contact information',
+        ),
+      );
+    } catch (e) {
+      FirebasePlatformExceptionAlertDialog(
+        title: 'Failed operation',
+        exception: e,
+        actionText: 'OK',
+      ).show(context);
+    }
   }
 
   @override
@@ -59,12 +71,36 @@ class ProjectsPage extends StatelessWidget {
           ),
         ],
       ),
+      body: _buildProjectsList(context),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _createProject(context),
         child: Icon(
           Icons.add,
         ),
       ),
+    );
+  }
+
+  Widget _buildProjectsList(BuildContext context) {
+    final database = Provider.of<Database>(context, listen: false);
+    return StreamBuilder<List<Project>>(
+      stream: database.publicProjectsStream(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final jobs = snapshot.data;
+          final children = jobs.map((job) => Text(job.name)).toList();
+          return ListView(
+            children: children,
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text('There was a problem reading from the database'),
+          );
+        }
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      },
     );
   }
 }
