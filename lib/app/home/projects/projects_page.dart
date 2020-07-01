@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:just_serve/app/home/models/project.dart';
-import 'package:just_serve/custom_widgets/firebase_platform_exception_alert_dialog.dart';
 import 'package:just_serve/custom_widgets/platform_alert_dialog.dart';
 import 'package:just_serve/services/auth.dart';
 import 'package:just_serve/services/database.dart';
 import 'package:provider/provider.dart';
+import 'add_project_page.dart';
 
 class ProjectsPage extends StatelessWidget {
   Future<void> _signOut(BuildContext context) async {
@@ -29,29 +29,6 @@ class ProjectsPage extends StatelessWidget {
     }
   }
 
-  Future<void> _createProject(BuildContext context) async {
-    try {
-      print('');
-      final database = Provider.of<Database>(
-        context,
-        listen: false,
-      );
-      await database.createProject(
-        Project(
-          description: 'this is the project description',
-          name: 'project name',
-          ownerContactInformation: 'contact information',
-        ),
-      );
-    } catch (e) {
-      FirebasePlatformExceptionAlertDialog(
-        title: 'Failed operation',
-        exception: e,
-        actionText: 'OK',
-      ).show(context);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,7 +50,7 @@ class ProjectsPage extends StatelessWidget {
       ),
       body: _buildProjectsList(context),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _createProject(context),
+        onPressed: () => AddProjectPage.show(context),
         child: Icon(
           Icons.add,
         ),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'file:///C:/Users/Jose/StudioProjects/LoseYourself/lib/app/home/projects_page.dart';
 import 'package:just_serve/app/sign_in/sign_in_page.dart';
 import 'package:just_serve/services/auth.dart';
 import 'package:just_serve/services/database.dart';
 import 'package:provider/provider.dart';
+import 'home/projects/projects_page.dart';
 
 class LandingPage extends StatelessWidget {
   @override
@@ -21,7 +21,9 @@ class LandingPage extends StatelessWidget {
             return SignInPage.create(context);
           }
           return Provider<Database>(
-            create: (_) => FirestoreDatabase(uid: user.uid,),
+            create: (_) => FirestoreDatabase(
+              uid: user.uid,
+            ),
             child: ProjectsPage(),
           );
         } else {
