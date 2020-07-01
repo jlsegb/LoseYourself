@@ -14,21 +14,27 @@ abstract class Database {
 class FirestoreDatabase implements Database {
   FirestoreDatabase({@required this.uid}) : assert(uid != null);
   final String uid;
-  final FirestoreService firestoreService = FirestoreService.instance;
+  final FirestoreService _firestoreService = FirestoreService.instance;
 
   Future<void> createProject(Project project) async {
     final personalProjects = APIPath.personalProject(uid, "project_abc");
     final allProjects = APIPath.publicProject('project_abc');
 
-    await firestoreService.setData(personalProjects, project.toMap());
-    await firestoreService.setData(allProjects, project.toMap());
+    await _firestoreService.setData(personalProjects, project.toMap());
+    await _firestoreService.setData(allProjects, project.toMap());
   }
 
   Stream<List<Project>> personalProjectsStream() {
-    return firestoreService.collectionStream(APIPath.personalProjectsList(uid));
+    return _firestoreService.collectionStream(
+      path: APIPath.personalProjectsList(uid),
+      builder: (data) => Project.fromMap(data),
+    );
   }
 
   Stream<List<Project>> publicProjectsStream() {
-    return firestoreService.collectionStream(APIPath.publicProjectsList());
+    return _firestoreService.collectionStream(
+      path: APIPath.publicProjectsList(),
+      builder: (data) => Project.fromMap(data),
+    );
   }
 }
