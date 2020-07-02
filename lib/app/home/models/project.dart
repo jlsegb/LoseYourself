@@ -4,23 +4,27 @@ class Project {
   Project({
     @required this.description,
     @required this.name,
-    @required this.ownerContactInformation,
+    @required this.contactInfo,
+    @required this.date,
   });
 
-  final String ownerContactInformation;
+  final String contactInfo;
   final String name;
   final String description;
+  final String date;
 
   factory Project.fromMap(Map<String, dynamic> data) {
     if (data != null) {
-      final String ownerContactInformation = data['ownerContactInformation'];
+      final String contactInfo = data['contactInfo'];
       final String name = data['name'];
       final String description = data['description'];
+      final String date = data['date'];
 
       return Project(
         name: name,
-        ownerContactInformation: ownerContactInformation,
+        contactInfo: contactInfo,
         description: description,
+        date: date,
       );
     }
 
@@ -30,8 +34,9 @@ class Project {
   Map<String, dynamic> toMap() {
     return {
       'name': name,
-      'ownerContactInformation': ownerContactInformation,
+      'contactInfo': contactInfo,
       'description': description,
+      'date': date,
     };
   }
 }
