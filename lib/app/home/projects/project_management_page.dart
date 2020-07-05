@@ -44,6 +44,7 @@ class _ProjectManagementPageState extends State<ProjectManagementPage> {
   String _projectDate;
   bool _isSaving = false;
   bool _isEditting = false;
+
   //TODO: make sure the user is not able to create a new job by changing the
   //For example: if I created project A. Then I go to edit it and name it B
   // instead of editing the project I'll just create another project.
@@ -91,7 +92,7 @@ class _ProjectManagementPageState extends State<ProjectManagementPage> {
         final projects = await widget.database.publicProjectsStream().first;
         final postedProjectNames =
             projects.map((project) => project.name).toList();
-        if (widget.project != null){
+        if (widget.project != null) {
           postedProjectNames.remove(_projectName);
         }
         if (postedProjectNames.contains(_projectName)) {
@@ -225,7 +226,8 @@ class _ProjectManagementPageState extends State<ProjectManagementPage> {
         textInputAction: TextInputAction.next,
         focusNode: _nameFocusNode,
         onEditingComplete: _nameEditingComplete,
-        validator: (value) => value.isNotEmpty ? null : 'The project must have a name',
+        validator: (value) =>
+            value.isNotEmpty ? null : 'The project must have a name',
       ),
       TextFormField(
         initialValue: _description,
@@ -235,8 +237,8 @@ class _ProjectManagementPageState extends State<ProjectManagementPage> {
         onSaved: (value) => _description = value,
         focusNode: _descriptionFocusNode,
         onEditingComplete: _descriptionEditingComplete,
-        validator: (value) => value.isNotEmpty ? null : 'The project must have a description',
-
+        validator: (value) =>
+            value.isNotEmpty ? null : 'The project must have a description',
       ),
       TextFormField(
         initialValue: _contactInfo,
@@ -246,8 +248,9 @@ class _ProjectManagementPageState extends State<ProjectManagementPage> {
         onSaved: (value) => _contactInfo = value,
         focusNode: _contactInfoFocusNode,
         onEditingComplete: _contactInfoEditingComplete,
-        validator: (value) => value.isNotEmpty ? null : 'The project must have a contact information',
-
+        validator: (value) => value.isNotEmpty
+            ? null
+            : 'The project must have a contact information',
       ),
       TextFormField(
         initialValue: _projectDate,
@@ -261,7 +264,8 @@ class _ProjectManagementPageState extends State<ProjectManagementPage> {
         onSaved: (value) => _projectDate = value,
         focusNode: _dateFocusNode,
         onEditingComplete: _dateEditingComplete,
-        validator: (value) => value.isNotEmpty ? null : 'The project must have a date',
+        validator: (value) =>
+            value.isNotEmpty ? null : 'The project must have a date',
       ),
     ];
   }

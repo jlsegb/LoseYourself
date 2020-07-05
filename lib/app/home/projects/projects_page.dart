@@ -69,7 +69,8 @@ class ProjectsPage extends StatelessWidget {
           final children = projects
               .map((project) => ProjectListTile(
                     project: project,
-                    onTap: () => ProjectManagementPage.show(context, project: project),
+                    onTap: () =>
+                        ProjectManagementPage.show(context, project: project),
                   ))
               .toList();
           return ListView(

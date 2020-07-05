@@ -11,8 +11,10 @@ class FirestoreService {
     await reference.setData(data);
   }
 
-  Stream<List<T>> collectionStream<T>(
-      {@required String path, @required T builder(Map<String, dynamic> data, String projectId)}) {
+  Stream<List<T>> collectionStream<T>({
+    @required String path,
+    @required T builder(Map<String, dynamic> data, String projectId),
+  }) {
     final reference = Firestore.instance.collection(path);
     final snapshots = reference.snapshots();
 

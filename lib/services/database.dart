@@ -9,8 +9,10 @@ abstract class Database {
   Future<void> setProject(Project project);
 
   Stream<List<Project>> personalProjectsStream();
-  String generateProjectIdFromTime();
+
   Stream<List<Project>> publicProjectsStream();
+
+  String generateProjectIdFromTime();
 }
 
 class FirestoreDatabase implements Database {
