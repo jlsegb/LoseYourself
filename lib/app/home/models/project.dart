@@ -6,14 +6,16 @@ class Project {
     @required this.name,
     @required this.contactInfo,
     @required this.date,
+    @required this.id,
   });
 
   final String contactInfo;
   final String name;
   final String description;
   final String date;
+  final String id;
 
-  factory Project.fromMap(Map<String, dynamic> data) {
+  factory Project.fromMap(Map<String, dynamic> data, String projectId) {
     if (data != null) {
       final String contactInfo = data['contactInfo'];
       final String name = data['name'];
@@ -25,6 +27,7 @@ class Project {
         contactInfo: contactInfo,
         description: description,
         date: date,
+        id: projectId,
       );
     }
 

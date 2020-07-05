@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:just_serve/app/home/models/project.dart';
+import 'package:just_serve/app/home/projects/project_list_tile.dart';
 import 'package:just_serve/custom_widgets/platform_alert_dialog.dart';
 import 'package:just_serve/services/auth.dart';
 import 'package:just_serve/services/database.dart';
 import 'package:provider/provider.dart';
-import 'add_project_page.dart';
+import 'project_management_page.dart';
 
 class ProjectsPage extends StatelessWidget {
   Future<void> _signOut(BuildContext context) async {
@@ -50,7 +51,7 @@ class ProjectsPage extends StatelessWidget {
       ),
       body: _buildProjectsList(context),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => AddProjectPage.show(context),
+        onPressed: () => ProjectManagementPage.show(context),
         child: Icon(
           Icons.add,
         ),
@@ -61,11 +62,16 @@ class ProjectsPage extends StatelessWidget {
   Widget _buildProjectsList(BuildContext context) {
     final database = Provider.of<Database>(context, listen: false);
     return StreamBuilder<List<Project>>(
-      stream: database.publicProjectsStream(),
+      stream: database.personalProjectsStream(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          final jobs = snapshot.data;
-          final children = jobs.map((job) => Text(job.name)).toList();
+          final projects = snapshot.data;
+          final children = projects
+              .map((project) => ProjectListTile(
+                    project: project,
+                    onTap: () => ProjectManagementPage.show(context, project: project),
+                  ))
+              .toList();
           return ListView(
             children: children,
           );

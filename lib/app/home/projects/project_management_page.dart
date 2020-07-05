@@ -2,23 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:just_serve/app/home/models/project.dart';
 import 'package:just_serve/custom_widgets/firebase_platform_exception_alert_dialog.dart';
+import 'package:just_serve/custom_widgets/platform_alert_dialog.dart';
 import 'package:just_serve/services/database.dart';
 import 'package:provider/provider.dart';
 
-class AddProjectPage extends StatefulWidget {
-  const AddProjectPage({Key key, @required this.database}) : super(key: key);
+class ProjectManagementPage extends StatefulWidget {
+  const ProjectManagementPage({
+    Key key,
+    this.project,
+    @required this.database,
+  }) : super(key: key);
 
+  final Project project;
   final Database database;
 
-  static Future<void> show(BuildContext context) async {
+  static Future<void> show(BuildContext context, {Project project}) async {
     final database = Provider.of<Database>(
       context,
       listen: false,
     );
     await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => AddProjectPage(
+        builder: (context) => ProjectManagementPage(
           database: database,
+          project: project,
         ),
         fullscreenDialog: true,
       ),
@@ -26,21 +33,37 @@ class AddProjectPage extends StatefulWidget {
   }
 
   @override
-  _AddProjectPageState createState() => _AddProjectPageState();
+  _ProjectManagementPageState createState() => _ProjectManagementPageState();
 }
 
-class _AddProjectPageState extends State<AddProjectPage> {
+class _ProjectManagementPageState extends State<ProjectManagementPage> {
   final _formKey = GlobalKey<FormState>();
   String _projectName;
   String _description;
   String _contactInfo;
   String _projectDate;
-  bool isSaving = false;
+  bool _isSaving = false;
+  bool _isEditting = false;
+  //TODO: make sure the user is not able to create a new job by changing the
+  //For example: if I created project A. Then I go to edit it and name it B
+  // instead of editing the project I'll just create another project.
 
   final FocusNode _nameFocusNode = FocusNode();
   final FocusNode _descriptionFocusNode = FocusNode();
   final FocusNode _contactInfoFocusNode = FocusNode();
   final FocusNode _dateFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.project != null) {
+      _projectName = widget.project.name;
+      _contactInfo = widget.project.contactInfo;
+      _description = widget.project.description;
+      _projectDate = widget.project.date;
+      _isEditting = true;
+    }
+  }
 
   void dispose() {
     _nameFocusNode.dispose();
@@ -65,14 +88,31 @@ class _AddProjectPageState extends State<AddProjectPage> {
   Future<void> _submit() async {
     if (_validateAndSaveForm() == true) {
       try {
-        isSaving = true;
+        final projects = await widget.database.publicProjectsStream().first;
+        final postedProjectNames =
+            projects.map((project) => project.name).toList();
+        if (widget.project != null){
+          postedProjectNames.remove(_projectName);
+        }
+        if (postedProjectNames.contains(_projectName)) {
+          PlatformAlertDialog(
+            title: 'Unable to add \'$_projectName\'',
+            defaultActionText: 'OK',
+            dialogContent:
+                'This project name is in use by a different project. '
+                '\n\nPlease choose a different project name',
+          ).show(context);
+          return;
+        }
+        _isSaving = true;
         final project = Project(
           name: _projectName,
           description: _description,
           contactInfo: _contactInfo,
           date: _projectDate,
+          id: widget.project?.id ?? widget.database.generateProjectIdFromTime(),
         );
-        await widget.database.createProject(project);
+        await widget.database.setProject(project);
         Navigator.of(context).pop();
       } on PlatformException catch (e) {
         FirebasePlatformExceptionAlertDialog(
@@ -81,7 +121,7 @@ class _AddProjectPageState extends State<AddProjectPage> {
           exception: e,
         ).show(context);
       } finally {
-        isSaving = false;
+        _isSaving = false;
       }
     }
   }
@@ -102,7 +142,7 @@ class _AddProjectPageState extends State<AddProjectPage> {
             ),
           ),
         ],
-        title: Text('New project'),
+        title: Text(widget.project == null ? 'New project' : 'Edit Project'),
         elevation: 5.0,
       ),
       body: _buildContents(),
@@ -142,17 +182,26 @@ class _AddProjectPageState extends State<AddProjectPage> {
 
   void _nameEditingComplete() {
     _formKey.currentState.save();
-    _requestNextFocusNode(_projectName, _descriptionFocusNode,);
+    _requestNextFocusNode(
+      _projectName,
+      _descriptionFocusNode,
+    );
   }
 
   void _descriptionEditingComplete() {
     _formKey.currentState.save();
-    _requestNextFocusNode(_description, _contactInfoFocusNode,);
+    _requestNextFocusNode(
+      _description,
+      _contactInfoFocusNode,
+    );
   }
 
   void _contactInfoEditingComplete() {
     _formKey.currentState.save();
-    _requestNextFocusNode(_contactInfo, _dateFocusNode,);
+    _requestNextFocusNode(
+      _contactInfo,
+      _dateFocusNode,
+    );
   }
 
   void _dateEditingComplete() {
@@ -169,31 +218,40 @@ class _AddProjectPageState extends State<AddProjectPage> {
   List<Widget> _buildFormChildren() {
     return [
       TextFormField(
-        enabled: !isSaving,
+        initialValue: _projectName,
+        enabled: !_isSaving,
         decoration: InputDecoration(labelText: 'Project name'),
         onSaved: (value) => _projectName = value,
         textInputAction: TextInputAction.next,
         focusNode: _nameFocusNode,
         onEditingComplete: _nameEditingComplete,
+        validator: (value) => value.isNotEmpty ? null : 'The project must have a name',
       ),
       TextFormField(
-        enabled: !isSaving,
+        initialValue: _description,
+        enabled: !_isSaving,
         decoration: InputDecoration(labelText: 'Project description'),
         textInputAction: TextInputAction.next,
         onSaved: (value) => _description = value,
         focusNode: _descriptionFocusNode,
         onEditingComplete: _descriptionEditingComplete,
+        validator: (value) => value.isNotEmpty ? null : 'The project must have a description',
+
       ),
       TextFormField(
-        enabled: !isSaving,
+        initialValue: _contactInfo,
+        enabled: !_isSaving,
         decoration: InputDecoration(labelText: 'Contact information'),
         textInputAction: TextInputAction.next,
         onSaved: (value) => _contactInfo = value,
         focusNode: _contactInfoFocusNode,
         onEditingComplete: _contactInfoEditingComplete,
+        validator: (value) => value.isNotEmpty ? null : 'The project must have a contact information',
+
       ),
       TextFormField(
-        enabled: !isSaving,
+        initialValue: _projectDate,
+        enabled: !_isSaving,
         decoration: InputDecoration(
           labelText: 'Project date',
           hintText: 'MM/DD/YYYY',
@@ -203,6 +261,7 @@ class _AddProjectPageState extends State<AddProjectPage> {
         onSaved: (value) => _projectDate = value,
         focusNode: _dateFocusNode,
         onEditingComplete: _dateEditingComplete,
+        validator: (value) => value.isNotEmpty ? null : 'The project must have a date',
       ),
     ];
   }
