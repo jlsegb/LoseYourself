@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:just_serve/app/home/models/project.dart';
+import 'package:just_serve/app/home/projects/list_items_builder.dart';
 import 'package:just_serve/app/home/projects/project_list_tile.dart';
+import 'package:just_serve/custom_widgets/firebase_platform_exception_alert_dialog.dart';
 import 'package:just_serve/custom_widgets/platform_alert_dialog.dart';
 import 'package:just_serve/services/auth.dart';
 import 'package:just_serve/services/database.dart';
@@ -27,6 +30,19 @@ class ProjectsPage extends StatelessWidget {
 
     if (isLogoutRequested) {
       _signOut(context);
+    }
+  }
+
+  Future<void> _delete(BuildContext context, Project project) async {
+    try {
+      final database = Provider.of<Database>(context, listen: false);
+      await database.deleteProject(project);
+    } on PlatformException catch (e) {
+      FirebasePlatformExceptionAlertDialog(
+        title: 'Failed to delete ${project.name}.',
+        actionText: 'OK',
+        exception: e,
+      ).show(context);
     }
   }
 
@@ -64,25 +80,18 @@ class ProjectsPage extends StatelessWidget {
     return StreamBuilder<List<Project>>(
       stream: database.personalProjectsStream(),
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          final projects = snapshot.data;
-          final children = projects
-              .map((project) => ProjectListTile(
-                    project: project,
-                    onTap: () =>
-                        ProjectManagementPage.show(context, project: project),
-                  ))
-              .toList();
-          return ListView(
-            children: children,
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text('There was a problem reading from the database'),
-          );
-        }
-        return Center(
-          child: CircularProgressIndicator(),
+        return ListItemsBuilder(
+          snapshot: snapshot,
+          itemBuilder: (context, project) => Dismissible(
+            key: Key('project-${project.id}'),
+            background: Container(color: Colors.red,),
+            direction: DismissDirection.endToStart,
+            onDismissed: (direction) => _delete(context, project),
+            child: ProjectListTile(
+              project: project,
+              onTap: () => ProjectManagementPage.show(context, project: project),
+            ),
+          ),
         );
       },
     );

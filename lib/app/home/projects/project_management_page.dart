@@ -43,11 +43,6 @@ class _ProjectManagementPageState extends State<ProjectManagementPage> {
   String _contactInfo;
   String _projectDate;
   bool _isSaving = false;
-  bool _isEditting = false;
-
-  //TODO: make sure the user is not able to create a new job by changing the
-  //For example: if I created project A. Then I go to edit it and name it B
-  // instead of editing the project I'll just create another project.
 
   final FocusNode _nameFocusNode = FocusNode();
   final FocusNode _descriptionFocusNode = FocusNode();
@@ -62,7 +57,6 @@ class _ProjectManagementPageState extends State<ProjectManagementPage> {
       _contactInfo = widget.project.contactInfo;
       _description = widget.project.description;
       _projectDate = widget.project.date;
-      _isEditting = true;
     }
   }
 
