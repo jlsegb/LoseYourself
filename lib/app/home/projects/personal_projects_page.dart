@@ -4,34 +4,11 @@ import 'package:just_serve/app/home/models/project.dart';
 import 'package:just_serve/app/home/projects/list_items_builder.dart';
 import 'package:just_serve/app/home/projects/project_list_tile.dart';
 import 'package:just_serve/custom_widgets/firebase_platform_exception_alert_dialog.dart';
-import 'package:just_serve/custom_widgets/platform_alert_dialog.dart';
-import 'package:just_serve/services/auth.dart';
 import 'package:just_serve/services/database.dart';
 import 'package:provider/provider.dart';
 import 'project_management_page.dart';
 
-class ProjectsPage extends StatelessWidget {
-  Future<void> _signOut(BuildContext context) async {
-    final auth = Provider.of<AuthBase>(context, listen: false);
-    try {
-      await auth.signOut();
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  Future<void> _confirmSignOut(BuildContext context) async {
-    final isLogoutRequested = await PlatformAlertDialog(
-      defaultActionText: 'Logout',
-      dialogContent: 'Are you sure you want to logout?',
-      title: 'Logout',
-      cancelActionText: 'Cancel',
-    ).show(context);
-
-    if (isLogoutRequested) {
-      _signOut(context);
-    }
-  }
+class PersonalProjectsPage extends StatelessWidget {
 
   Future<void> _delete(BuildContext context, Project project) async {
     try {
@@ -51,27 +28,16 @@ class ProjectsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Projects"),
+        title: Text("Personal Projects"),
         actions: <Widget>[
-          FlatButton(
-            child: Text(
-              "Log out",
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.white,
-              ),
-            ),
-            onPressed: () => _confirmSignOut(context),
+          IconButton(
+            icon: Icon(Icons.add),
+            color: Colors.white,
+            onPressed: () => ProjectManagementPage.show(context),
           ),
         ],
       ),
       body: _buildProjectsList(context),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => ProjectManagementPage.show(context),
-        child: Icon(
-          Icons.add,
-        ),
-      ),
     );
   }
 
@@ -84,12 +50,15 @@ class ProjectsPage extends StatelessWidget {
           snapshot: snapshot,
           itemBuilder: (context, project) => Dismissible(
             key: Key('project-${project.id}'),
-            background: Container(color: Colors.red,),
+            background: Container(
+              color: Colors.red,
+            ),
             direction: DismissDirection.endToStart,
             onDismissed: (direction) => _delete(context, project),
             child: ProjectListTile(
               project: project,
-              onTap: () => ProjectManagementPage.show(context, project: project),
+              onTap: () =>
+                  ProjectManagementPage.show(context, project: project),
             ),
           ),
         );

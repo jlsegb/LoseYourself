@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: "Material App Title",
         theme: ThemeData(
-          primarySwatch: Colors.pink,
+          primarySwatch: Colors.indigo,
         ),
         home: LandingPage(),
       ),

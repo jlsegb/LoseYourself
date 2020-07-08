@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:just_serve/app/home/home_page.dart';
 import 'package:just_serve/app/sign_in/sign_in_page.dart';
 import 'package:just_serve/services/auth.dart';
 import 'package:just_serve/services/database.dart';
 import 'package:provider/provider.dart';
-import 'home/projects/projects_page.dart';
 
 class LandingPage extends StatelessWidget {
   @override
@@ -24,7 +24,7 @@ class LandingPage extends StatelessWidget {
             create: (_) => FirestoreDatabase(
               uid: user.uid,
             ),
-            child: ProjectsPage(),
+            child: HomePage(),
           );
         } else {
           return Scaffold(
