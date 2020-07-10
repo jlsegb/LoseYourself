@@ -18,7 +18,10 @@ class ProjectDetailsPage extends StatelessWidget {
       context,
       listen: false,
     );
-    await Navigator.of(context).push(
+    await Navigator.of(
+      context,
+      rootNavigator: true,
+    ).push(
       MaterialPageRoute(
         builder: (context) => ProjectDetailsPage(
           database: database,
@@ -29,6 +32,10 @@ class ProjectDetailsPage extends StatelessWidget {
     );
   }
 
+/*  String _buildStringDate() {
+    return DateFormatter.dateToString(DateTime.parse(project.date));
+  }
+*/
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,7 +131,7 @@ class ProjectDetailsPage extends StatelessWidget {
         height: 4.0,
       ),
       Text(
-        project.date,
+        '${project.date} at ${project.time}',
         style: TextStyle(
           fontSize: 16.0,
           color: Colors.black87,

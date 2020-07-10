@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:just_serve/app/sign_in/email_sign_in_model.dart';
 import 'package:just_serve/services/auth.dart';

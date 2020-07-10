@@ -1,4 +1,4 @@
-import 'package:just_serve/app/sign_in/validators.dart';
+import 'package:just_serve/app/sign_in/sign_in_validators.dart';
 
 enum EmailSignInFormType { signIn, register }
 

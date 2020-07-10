@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:just_serve/app/home/models/project.dart';
+import 'package:just_serve/app/home/projects/date_formatter.dart';
+import 'package:just_serve/app/home/projects/date_time_picker.dart';
 import 'package:just_serve/custom_widgets/firebase_platform_exception_alert_dialog.dart';
 import 'package:just_serve/custom_widgets/platform_alert_dialog.dart';
 import 'package:just_serve/services/database.dart';
@@ -21,7 +24,10 @@ class ProjectManagementPage extends StatefulWidget {
       context,
       listen: false,
     );
-    await Navigator.of(context).push(
+    await Navigator.of(
+      context,
+      rootNavigator: true,
+    ).push(
       MaterialPageRoute(
         builder: (context) => ProjectManagementPage(
           database: database,
@@ -41,7 +47,10 @@ class _ProjectManagementPageState extends State<ProjectManagementPage> {
   String _projectName;
   String _description;
   String _contactInfo;
-  String _projectDate;
+  String _dateString;
+  String _timeString;
+  DateTime _date = DateTime.now();
+  TimeOfDay _time = TimeOfDay.now();
   bool _isSaving = false;
 
   final FocusNode _nameFocusNode = FocusNode();
@@ -56,8 +65,27 @@ class _ProjectManagementPageState extends State<ProjectManagementPage> {
       _projectName = widget.project.name;
       _contactInfo = widget.project.contactInfo;
       _description = widget.project.description;
-      _projectDate = widget.project.date;
+      _dateString = widget.project.date;
+      _timeString = widget.project.time;
+      _date = _dateString != null
+          ? DateFormatter.stringToDate(_dateString)
+          : DateTime.now();
+      _time = _timeString != null
+          ? _stringToTimeOfDay(_timeString)
+          : TimeOfDay.now();
     }
+  }
+
+  TimeOfDay _stringToTimeOfDay(String tod) {
+    final format = DateFormat.jm(); //"6:00 AM"
+    return TimeOfDay.fromDateTime(format.parse(tod));
+  }
+
+  String _timeOfDayToString(TimeOfDay tod) {
+    final now = new DateTime.now();
+    final dt = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
+    final format = DateFormat.jm(); //"6:00 AM"
+    return format.format(dt);
   }
 
   void dispose() {
@@ -71,6 +99,8 @@ class _ProjectManagementPageState extends State<ProjectManagementPage> {
 
   bool _validateAndSaveForm() {
     final formState = _formKey.currentState;
+    _dateString = DateFormatter.dateToString(_date);
+    _timeString = _timeOfDayToString(_time);
 
     if (formState.validate() == true) {
       formState.save();
@@ -104,7 +134,8 @@ class _ProjectManagementPageState extends State<ProjectManagementPage> {
           name: _projectName,
           description: _description,
           contactInfo: _contactInfo,
-          date: _projectDate,
+          date: _dateString,
+          time: _timeString,
           id: widget.project?.id ?? widget.database.generateProjectIdFromTime(),
         );
         await widget.database.setProject(project);
@@ -199,17 +230,6 @@ class _ProjectManagementPageState extends State<ProjectManagementPage> {
     );
   }
 
-  void _dateEditingComplete() {
-    _formKey.currentState.save();
-    _lastTextFieldEditingComplete(_projectDate);
-  }
-
-  void _lastTextFieldEditingComplete(String value) {
-    if (value != null) {
-      _submit();
-    }
-  }
-
   List<Widget> _buildFormChildren() {
     return [
       TextFormField(
@@ -220,19 +240,18 @@ class _ProjectManagementPageState extends State<ProjectManagementPage> {
         textInputAction: TextInputAction.next,
         focusNode: _nameFocusNode,
         onEditingComplete: _nameEditingComplete,
-        validator: (value) =>
-            value.isNotEmpty ? null : 'The project must have a name',
+        validator: _nameValidator,
       ),
       TextFormField(
         initialValue: _description,
         enabled: !_isSaving,
-        decoration: InputDecoration(labelText: 'Project description'),
+        decoration: InputDecoration(labelText: 'Description'),
         textInputAction: TextInputAction.next,
         onSaved: (value) => _description = value,
         focusNode: _descriptionFocusNode,
         onEditingComplete: _descriptionEditingComplete,
-        validator: (value) =>
-            value.isNotEmpty ? null : 'The project must have a description',
+        validator: _descriptionValidator,
+        maxLines: null,
       ),
       TextFormField(
         initialValue: _contactInfo,
@@ -242,25 +261,49 @@ class _ProjectManagementPageState extends State<ProjectManagementPage> {
         onSaved: (value) => _contactInfo = value,
         focusNode: _contactInfoFocusNode,
         onEditingComplete: _contactInfoEditingComplete,
-        validator: (value) => value.isNotEmpty
-            ? null
-            : 'The project must have a contact information',
+        validator: _contactValidator,
       ),
-      TextFormField(
-        initialValue: _projectDate,
-        enabled: !_isSaving,
-        decoration: InputDecoration(
-          labelText: 'Project date',
-          hintText: 'MM/DD/YYYY',
-        ),
-        keyboardType: TextInputType.datetime,
-        textInputAction: TextInputAction.done,
-        onSaved: (value) => _projectDate = value,
-        focusNode: _dateFocusNode,
-        onEditingComplete: _dateEditingComplete,
-        validator: (value) =>
-            value.isNotEmpty ? null : 'The project must have a date',
+      DateTimePicker(
+        labelText: 'Start date and time',
+        selectDate: (date) => setState(() => _date = date),
+        selectTime: (time) => setState(() => _time = time),
+        selectedDate: _date,
+        selectedTime: _time,
       ),
     ];
+  }
+
+  String _nameValidator(String name) {
+    return _isNamePresent(name)
+        ? _isNameShort(name)
+            ? null
+            : 'The name cannot be longer than 25 characters'
+        : 'The project must have a name';
+  }
+
+  bool _isNamePresent(String name) {
+    return name.isNotEmpty;
+  }
+
+  bool _isNameShort(String name) {
+    return name.length <= 25;
+  }
+
+  String _contactValidator(String contact) {
+    return _isContactValid(contact) ? null : 'The project must have a contact';
+  }
+
+  bool _isContactValid(String contact) {
+    return contact.isNotEmpty;
+  }
+
+  String _descriptionValidator(String description) {
+    return _isDescriptionValid(description)
+        ? null
+        : 'The project must have a description';
+  }
+
+  bool _isDescriptionValid(String description) {
+    return description.isNotEmpty;
   }
 }
