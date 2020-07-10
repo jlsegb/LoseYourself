@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:just_serve/app/home/models/project.dart';
 import 'package:just_serve/services/database.dart';
 import 'package:provider/provider.dart';
 
-class ProjectDetailsPage extends StatefulWidget {
+class ProjectDetailsPage extends StatelessWidget {
   const ProjectDetailsPage({
     Key key,
-    this.project,
+    @required this.project,
     @required this.database,
   }) : super(key: key);
 
@@ -31,32 +30,11 @@ class ProjectDetailsPage extends StatefulWidget {
   }
 
   @override
-  _ProjectDetailsPageState createState() => _ProjectDetailsPageState();
-}
-
-class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
-  final _formKey = GlobalKey<FormState>();
-  String _projectName;
-  String _description;
-  String _contactInfo;
-  String _projectDate;
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.project != null) {
-      _projectName = widget.project.name;
-      _contactInfo = widget.project.contactInfo;
-      _description = widget.project.description;
-      _projectDate = widget.project.date;
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.project.name),
+        centerTitle: true,
+        title: Text(project.name),
         elevation: 5.0,
       ),
       body: _buildContents(),
@@ -71,48 +49,86 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
         child: Card(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: _buildForm(),
+            child: _buildColumn(),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildForm() {
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: _buildFormChildren(),
-      ),
+  Widget _buildColumn() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: _buildFormChildren(),
     );
   }
 
   List<Widget> _buildFormChildren() {
     return [
-      TextFormField(
-        initialValue: _projectName,
-        enabled: false,
-        decoration: InputDecoration(labelText: 'Project name'),
-        textInputAction: TextInputAction.next,
+      Text(
+        'Description:',
+        style: TextStyle(
+          fontSize: 12.0,
+          color: Colors.black,
+          decoration: TextDecoration.underline,
+          fontStyle: FontStyle.italic,
+        ),
       ),
-      TextFormField(
-        initialValue: _description,
-        enabled: false,
-        decoration: InputDecoration(labelText: 'Project description'),
-        textInputAction: TextInputAction.next,
+      SizedBox(
+        height: 4.0,
       ),
-      TextFormField(
-        initialValue: _contactInfo,
-        enabled: false,
-        decoration: InputDecoration(labelText: 'Contact information'),
+      Text(
+        project.description,
+        style: TextStyle(
+          fontSize: 16.0,
+          color: Colors.black87,
+          fontStyle: FontStyle.normal,
+        ),
       ),
-      TextFormField(
-        initialValue: _projectDate,
-        enabled: false,
-        decoration: InputDecoration(
-          labelText: 'Project date',
-          hintText: 'MM/DD/YYYY',
+      SizedBox(
+        height: 16.0,
+      ),
+      Text(
+        'Contact Information:',
+        style: TextStyle(
+          fontSize: 12.0,
+          color: Colors.black,
+          decoration: TextDecoration.underline,
+          fontStyle: FontStyle.italic,
+        ),
+      ),
+      SizedBox(
+        height: 4.0,
+      ),
+      Text(
+        project.contactInfo,
+        style: TextStyle(
+          fontSize: 16.0,
+          color: Colors.black87,
+          fontStyle: FontStyle.normal,
+        ),
+      ),
+      SizedBox(
+        height: 16.0,
+      ),
+      Text(
+        'Date:',
+        style: TextStyle(
+          fontSize: 12.0,
+          color: Colors.black,
+          decoration: TextDecoration.underline,
+          fontStyle: FontStyle.italic,
+        ),
+      ),
+      SizedBox(
+        height: 4.0,
+      ),
+      Text(
+        project.date,
+        style: TextStyle(
+          fontSize: 16.0,
+          color: Colors.black87,
+          fontStyle: FontStyle.normal,
         ),
       ),
     ];

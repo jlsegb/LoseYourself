@@ -9,7 +9,6 @@ import 'package:provider/provider.dart';
 import 'project_management_page.dart';
 
 class PersonalProjectsPage extends StatelessWidget {
-
   Future<void> _delete(BuildContext context, Project project) async {
     try {
       final database = Provider.of<Database>(context, listen: false);
@@ -31,7 +30,10 @@ class PersonalProjectsPage extends StatelessWidget {
         title: Text("Personal Projects"),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.add),
+            icon: Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Icon(Icons.add),
+            ),
             color: Colors.white,
             onPressed: () => ProjectManagementPage.show(context),
           ),
@@ -52,6 +54,13 @@ class PersonalProjectsPage extends StatelessWidget {
             key: Key('project-${project.id}'),
             background: Container(
               color: Colors.red,
+              alignment: Alignment.centerRight,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Icon(
+                  Icons.delete,
+                ),
+              ),
             ),
             direction: DismissDirection.endToStart,
             onDismissed: (direction) => _delete(context, project),

@@ -28,7 +28,6 @@ class CupertinoHomeScaffold extends StatelessWidget {
       tabBuilder: (context, index) {
         return CupertinoTabView(
           builder: (context) {
-            print('this is the index in the CupertinoTabView: $index');
             final tabItem = TabItem.values[index];
             return widgetBuilderMap[tabItem](context);
           },
